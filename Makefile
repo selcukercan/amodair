@@ -1,5 +1,5 @@
-CC		:= g++
-C_FLAGS := -std=c++17 -Wall -Wextra
+CXX		  := g++
+CXX_FLAGS := -Wall -Wextra -std=c++17 -ggdb
 
 BIN		:= bin
 SRC		:= src
@@ -7,20 +7,17 @@ INCLUDE	:= include
 LIB		:= lib
 
 LIBRARIES	:=
-
-ifeq ($(OS),Windows_NT)
-EXECUTABLE	:= main.exe
-else
 EXECUTABLE	:= main
-endif
+
 
 all: $(BIN)/$(EXECUTABLE)
 
-clean:
-	$(RM) $(BIN)/$(EXECUTABLE)
-
-run: all
+run: clean all
+	clear
 	./$(BIN)/$(EXECUTABLE)
 
-$(BIN)/$(EXECUTABLE): $(SRC)/*
-	$(CC) $(C_FLAGS) -I$(INCLUDE) -L$(LIB) $^ -o $@ $(LIBRARIES)
+$(BIN)/$(EXECUTABLE): $(SRC)/*.cpp
+	$(CXX) $(CXX_FLAGS) -I$(INCLUDE) -L$(LIB) $^ -o $@ $(LIBRARIES)
+
+clean:
+	-rm $(BIN)/*

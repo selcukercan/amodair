@@ -21,12 +21,7 @@ sa_family_t sun_family;
 char        sun_path[108]; /* pathname */ }; 
 
 
-template <typename T> auto my_param(T my_macro);
-
-
 int main() {
-	auto ret_param = my_param(AF_UNIX);
-
 	string tmp11 = "/home/selcuk/cpp/sockets/socket_1";
 	const char * SOCKET_ADDRESS = tmp11.c_str();
 	int BUFFER_SIZE = 12; 
