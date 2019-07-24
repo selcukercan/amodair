@@ -1,3 +1,4 @@
+/*
 #include "socket.h"
 #include <sys/socket.h>
 #include <stdexcept>
@@ -57,3 +58,4 @@ int Socket::acceptCall(int sfd, int caddr, int caddrlen){
 	}
 	return scfd;
 }
+ */

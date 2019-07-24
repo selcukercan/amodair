@@ -28,17 +28,6 @@ int main() {
 	// Close the connection if previous connection remained unclosed
 	unlink(SOCKET_ADDRESS);
 
-	// Socket Creation
-	// see: http://www.linuxhowtos.org/manpages/2/socket.htm
-	// socket(domain, type, protocol)
-	// The **domain** argument specifies a communication domain
-	//   AF_UNIX -> local communication
-	// The socket has the indicated **type**, which specifies the communication semantics.
-	//   SOCK_STREAM -> TCP
-	// The protocol indicates the **protocol** used for communication
-	//   0 -> Default Protocol
-	// socket(..) generates a files descriptor on linux
-
 	Socket my_socket;
 	// Socket Description
 	int sfd = my_socket.initializeSocket(AF_UNIX, SOCK_STREAM, 0);
@@ -56,9 +45,6 @@ int main() {
 
 
 	// Socket Binding 
-	// Attempt to bind
-	// Bind generated socket **sfd** to socket address **socket** 
-	//int bind_stat = bind(sfd, (const struct sockaddr *) &socket, sizeof(struct sockaddr_unix));
 	int bind_stat = my_socket.bindSocket(sfd, socket);
 	// Check for binding success
 	if(bind_stat == -1){
@@ -68,7 +54,7 @@ int main() {
 	// Attempt to listen
 	// Allowed size of the queue for waiting for connecting **sfd** 
 	int backlog = 1;
-	int listening = listen(sfd, backlog);
+	int listening = my_socket.listenSocket(sfd, backlog);
 
 	if(listening == -1){
 		handle_error("Failed to listen");
