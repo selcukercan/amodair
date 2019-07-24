@@ -22,7 +22,7 @@ char        sun_path[108]; /* pathname */ };
 
 
 int main() {
-	string tmp11 = "/home/selcuk/cpp/sockets/socket_1";
+	string tmp11 = "/home/selcuk/amodair/sockets/socket_1";
 	const char * SOCKET_ADDRESS = tmp11.c_str();
 	int BUFFER_SIZE = 12; 
 	// Close the connection if previous connection remained unclosed
@@ -39,8 +39,9 @@ int main() {
 	//   0 -> Default Protocol
 	// socket(..) generates a files descriptor on linux
 
+	Socket my_socket;
 	// Socket Description
-	int sfd = socket(AF_UNIX, SOCK_STREAM, 0);
+	int sfd = my_socket.initializeSocket(AF_UNIX, SOCK_STREAM, 0);
 	if(sfd == -1){
 		handle_error("Failed to create a file descriptor for the new socket");
 	}
@@ -57,8 +58,8 @@ int main() {
 	// Socket Binding 
 	// Attempt to bind
 	// Bind generated socket **sfd** to socket address **socket** 
-	int bind_stat = bind(sfd, (const struct sockaddr *) &socket, sizeof(struct sockaddr_unix)); 
-	
+	//int bind_stat = bind(sfd, (const struct sockaddr *) &socket, sizeof(struct sockaddr_unix));
+	int bind_stat = my_socket.bindSocket(sfd, socket);
 	// Check for binding success
 	if(bind_stat == -1){
 		 handle_error("Failed to bind");
@@ -94,8 +95,3 @@ int main() {
 	// Close the connection
 	unlink(SOCKET_ADDRESS); 
 }	
-
-template <typename T> auto my_param(T my_macro) {
-	T tmp_param = my_macro;
-	return tmp_param;    
-}
