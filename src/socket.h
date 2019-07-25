@@ -13,13 +13,10 @@
         exit(EXIT_FAILURE); \
     } while (0)
 
-using namespace std;
-using std::string;
-
 class Socket
 {
 public:
-    Socket(int SOCKET_TYPE, string SOCKET_ADDRESS);
+    Socket(int SOCKET_TYPE, std::string SOCKET_ADDRESS);
     ~Socket();
 
     int initializeSocket(int DOMAIN, int CONNECTION_TYPE, int protocol_type);
@@ -34,17 +31,19 @@ private:
     int DOMAIN_ = -1;
     int CONNECTION_TYPE_ = -1;
     int protocol_type_ = -1;
+    int sfd_ = -1; // server file descriptor
     // socket binding
     int fd = -1;
-    const char *SOCKET_ADDRESS_ = NULL;
+    const char *SOCKET_ADDRESS_ = nullptr;
     // client interaction
     int backlog_ = -1;
-    int sfd = -1;
-    int caddr = -1;
-    int caddrlen = -1;
+    //int sfd = -1;
+    //int caddr = -1;
+    //int caddrlen = -1;
+    int BUFFER_SIZE_ = -1;
 };
 
-Socket::Socket(int SOCKET_TYPE, string SOCKET_ADDRESS)
+Socket::Socket(int SOCKET_TYPE, std::string SOCKET_ADDRESS)
 {
     SOCKET_ADDRESS_ = SOCKET_ADDRESS.c_str();
     // Close the connection if previous connection remained unclosed
@@ -70,6 +69,7 @@ int Socket::initializeSocket(int DOMAIN, int CONNECTION_TYPE, int protocol_type)
     //   0 -> Default Protocol
     // socket(..) generates a files descriptor on linux
 
+    // create socket
     int sfd = socket(DOMAIN, CONNECTION_TYPE, protocol_type);
 
     // Check socket initialization success
@@ -82,6 +82,12 @@ int Socket::initializeSocket(int DOMAIN, int CONNECTION_TYPE, int protocol_type)
         std::cout << "Successfully to create a socket!" << std::endl;
     }
 
+    // store the passed arguments in object
+    DOMAIN_ = DOMAIN;
+    CONNECTION_TYPE_ = CONNECTION_TYPE;
+    protocol_type_ = protocol_type;
+    sfd_ = sfd;
+
     return sfd;
 }
 
@@ -90,8 +96,9 @@ int Socket::bindSocket(int fd, T socket)
 {
     // Attempt to bind
     // Bind generated socket **sfd** to socket address **socket**
-    //int bind_stat = bind(sfd, (const struct sockaddr *) &socket, sizeof(struct sockaddr_unix));
-    //unlink(socket.sun_path);
+    // int bind_stat = bind(sfd, (const struct sockaddr *) &socket, sizeof(struct sockaddr_unix));
+    // unlink(socket.sun_path);
+
     int bind_stat = bind(fd, (const struct sockaddr *)&socket, sizeof(T));
 
     // Check binding success
@@ -99,6 +106,10 @@ int Socket::bindSocket(int fd, T socket)
     {
         handle_error("Failed to bind");
     }
+
+    // store arguments
+    auto socketaddr_ = socket;
+
     return bind_stat;
 }
 
@@ -112,15 +123,21 @@ int Socket::listenSocket(int sfd, int backlog)
     {
         handle_error("Failed to listen");
     }
+
+    // store arguments
+    backlog_ = backlog;
+
     return list_stat;
 }
 
 int Socket::acceptCall(int sfd, int caddr, int caddrlen)
 {
     // see: http://www.linuxhowtos.org/manpages/2/accept.htm
-    //The accept() system call is used with connection-based socket types (SOCK_STREAM, SOCK_SEQPACKET).
-    //It extracts the first connection request on the queue of pending connections for the listening socket,
-    //sockfd, creates a new connected socket, and returns a new file descriptor referring to that socket.
+    //
+    // The accept() system call is used with connection-based socket types (SOCK_STREAM, SOCK_SEQPACKET).
+    // It extracts the first connection request on the queue of pending connections for the listening socket,
+    // sockfd, creates a new connected socket, and returns a new file descriptor referring to that socket.
+
     int scfd = 0; // TODO Is it a problem to initialize to 0?
 
     if (caddr == NULL)
@@ -131,16 +148,26 @@ int Socket::acceptCall(int sfd, int caddr, int caddrlen)
     {
         throw std::logic_error("Function not yet implemented");
     }
+
     return scfd;
 }
 
 int Socket::readSocket(int cfd, char *buffer, int BUFFER_SIZE)
 {
+    // see: http://man7.org/linux/man-pages/man2/read.2.html
+    //
+    // read() attempts to read up to ** BUFFER_SIZE ** bytes from file descriptor fd
+    // starting from *buffer
+
     int read_stat = read(cfd, buffer, BUFFER_SIZE);
+    
     if (read_stat == -1)
     {
         handle_error("Failed to read the buffer");
     }
+
+    // store arguments
+    BUFFER_SIZE_ = BUFFER_SIZE;
 
     return read_stat;
 }

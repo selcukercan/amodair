@@ -2,24 +2,19 @@
 #include <stdlib.h>
 #include <cstring>
 #include <sys/types.h>
-
 #include <string>
+
 #include "socket.h"
+#include "../lib/sockaddr_family.h"
 
 using namespace std;
 
-// Unix Socket Address Definition
-struct sockaddr_unix
-{
-	sa_family_t sun_family;
-	char sun_path[108]; /* pathname */
-};
-
 int main()
 {
-	string FD_ADDRESS = "/home/selcuk/amodair/sockets/socket_1";
+	//
+	string FD_ADDRESS = "/tmp/selcuk/amodair/sockets/socket_1";
 	const char *SOCKET_ADDRESS = FD_ADDRESS.c_str();
-	int BUFFER_SIZE = 12;
+	int BUFFER_SIZE = 1;
 	char buffer[BUFFER_SIZE];
 	int backlog = 1;
 	int SOCKET_TYPE = -1;
@@ -35,9 +30,9 @@ int main()
 
 	// Attempt to bind the socket
 	int bind_stat = my_socket.bindSocket(sfd, socket);
-	
+
 	// Attempt to listen
-	int listening = my_socket.listenSocket(sfd, backlog);
+	int list_stat = my_socket.listenSocket(sfd, backlog);
 
 	// Attempt to accept
 	int cfd = my_socket.acceptCall(sfd, NULL, NULL);
@@ -45,7 +40,7 @@ int main()
 	while (true)
 	{
 		// Attempt to read
-		int reading = my_socket.readSocket(cfd, buffer, BUFFER_SIZE);
+		int read_stat = my_socket.readSocket(cfd, buffer, BUFFER_SIZE);
 		printf(buffer);
 	}
 }
